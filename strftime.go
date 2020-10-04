@@ -43,22 +43,11 @@ func (r *reg) get(f string, t time.Time) string {
 func init() {
 	strftime = &reg{
 		fns: map[string]func(time.Time) string{
-			// The abbreviated name of the day of the week
 			"%a": func(t time.Time) string { return t.Format("Mon") },
-
-			// The full name of the day of the week
 			"%A": func(t time.Time) string { return t.Format("Monday") },
-
-			// The abbreviated month name
 			"%b": func(t time.Time) string { return t.Format("Feb") },
-
-			// The full month name
 			"%B": func(t time.Time) string { return t.Format("February") },
-
-			// The preferred date and time representation
-			"%c": func(t time.Time) string { return Fmt("%a %b %e %H:%M:%S %Y", t) },
-
-			// The century number (year/100) as a 2-digit integer
+			"%c": func(t time.Time) string { return Fmt("%F %T", t) },
 			"%C": func(t time.Time) string {
 				y, err := strconv.Atoi(Fmt("%Y", t))
 				if err != nil {
@@ -68,13 +57,34 @@ func init() {
 			},
 			"%d": func(t time.Time) string { return t.Format("02") },
 			"%D": func(t time.Time) string { return Fmt("%m/%d/%y", t) },
-			"%e": func(t time.Time) string { return Fmt(" 2", t) },
-
+			"%e": func(t time.Time) string { return t.Format("_2") },
+			"%F": func(t time.Time) string { return Fmt("%Y-%m-%d", t) },
+			"%g": func(t time.Time) string { return Fmt("%y", t) },
+			"%G": func(t time.Time) string { return Fmt("%Y", t) },
+			"%h": func(t time.Time) string { return Fmt("%b", t) },
+			"%H": func(t time.Time) string { return t.Format("15") },
+			"%I": func(t time.Time) string { return t.Format("03") },
+			"%l": func(t time.Time) string { return t.Format("_3") },
 			"%m": func(t time.Time) string { return t.Format("01") },
+			"%M": func(t time.Time) string { return t.Format("04") },
+			"%n": func(t time.Time) string { return "\n" },
+			"%R": func(t time.Time) string { return t.Format("15:04") },
+			"%s": func(t time.Time) string { return fmt.Sprintf("%d", t.Unix()) },
+			"%S": func(t time.Time) string { return t.Format("05") },
+			"%t": func(t time.Time) string { return "\t" },
+			"%T": func(t time.Time) string { return Fmt("%H:%M:%S", t) },
+			"%u": func(t time.Time) string {
+				if t.Weekday() == 0 {
+					return "7"
+				}
+				return string(t.Weekday())
+			},
+			"%w": func(t time.Time) string { return string(t.Weekday()) },
+			"%x": func(t time.Time) string { return Fmt("%F", t) },
+			"%X": func(t time.Time) string { return Fmt("%T", t) },
+
 			"%Y": func(t time.Time) string { return t.Format("2006") },
 			"%y": func(t time.Time) string { return t.Format("06") },
-
-			// A literal '%' character.
 			"%%": func(t time.Time) string { return "%" },
 		},
 	}
