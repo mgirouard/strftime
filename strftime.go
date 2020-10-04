@@ -7,18 +7,25 @@ import (
 	"time"
 )
 
-// Fmt formats a string with strftime
+// Fmt formats the time t according to the spec s. The spec s is a string which
+// may contain format sequences which begin with a '%' character and are
+// terminated by some other character. Formatting functions are registered to
+// special format sequences so that when a special format sequence is found it
+// is replaced with the result of the formatting function.
 func Fmt(s string, t time.Time) string {
 	b := []byte(s)
 	o := []string{}
 	for i := 0; i < len(b); i++ {
 		switch b[i] {
+		// assume all '%' strings are format sequences --- strftime.get will do
+		// the right thing and handle orinary sequences by returning the bytes
+		// back unmodified
 		case '%':
 			f := string(b[i : i+2])
 			o = append(o, strftime.get(f, t))
 			i += 1
 		default:
-			o = append(o, string(b[i:i+1]))
+			o = append(o, string(b[i]))
 		}
 	}
 	return strings.Join(o, "")
@@ -32,7 +39,7 @@ type reg struct {
 	fns map[string]func(time.Time) string
 }
 
-// get returns a formatted value or returns the value if it can't be formatted
+// get safely returns a formatted value or returns the value if it can't be formatted
 func (r *reg) get(f string, t time.Time) string {
 	if _, ok := r.fns[f]; ok {
 		return r.fns[f](t)
